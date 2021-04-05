@@ -1,0 +1,27 @@
+deployment:
+  image:
+    repository: <<AWS_ACCOUNT_ID>>.dkr.ecr.us-east-1.amazonaws.com/rewind/test-flask
+    tag: latest
+    pullPolicy: Always
+  port: 5000
+  replicas: 1
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 200m
+    limits:
+      memory: 200Mi
+      cpu: 500m
+
+service:
+  timeout: 60000
+  port: 5000
+
+mapping:
+  hostUrl: rewind.dev
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 1
+  averageUtilization: 75
+  

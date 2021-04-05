@@ -1,0 +1,15 @@
+vpc_id = "" // Update VPC ID
+cluster_name = "rewind-test-k8s"
+subnets = [""] // Update Private subnets
+alb_tg_arns = [""] // Update ALB Target Group ARN 
+instance_type = "" // Add instance type
+desired_capacity = "2"
+max_capacity= "12"
+min_capacity="2"
+cluster_version = "1.18"
+cloudwatch_policy_arn=""  // Update Cloudwatch policy ARN
+ami_type  = "AL2_x86_64"
+disk_size = 100
+source_security_group_ids = [""]
+node_group_name = "rewind-Node-Group"
+environment = "staging" // Update environemnt staging or production

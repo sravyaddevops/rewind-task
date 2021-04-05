@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  {{- include "mychart.labels" . | indent 2 }}
+spec:
+  {{- with .Values.deployment }}
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}
+  template:
+    metadata:
+      annotations: {{ include "annotations.checksum/config" . | indent 8 }}
+      labels:
+        app: {{ $.Release.Name }}
+    spec:
+      containers:
+      - name: {{ $.Release.Name }}
+        image: {{ .image.repository }}:{{ .image.tag }}
+        imagePullPolicy: {{ .image.pullPolicy }}
+        ports:
+        - containerPort: {{ .port }}
+        resources:
+          requests:
+            memory: {{ .resources.requests.memory | quote }}
+            cpu: {{ .resources.requests.cpu | quote }}
+          limits:
+            memory: {{ .resources.limits.memory | quote }}
+            cpu: {{ .resources.limits.cpu | quote }}
+  {{- end }}

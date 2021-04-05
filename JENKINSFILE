@@ -1,0 +1,56 @@
+pipeline {
+  agent any
+
+  stages {
+    /*******************************Source Code checkout*************************************************/
+    stage('SCM code Checkout') {
+      steps {
+        dir("$DIR_PROJECT") {
+        git branch: "master", changelog:false, credentialsId: 'XXXXXX', poll:false, url: "https://github.com/sravyaddevops/rewind-devops.git"
+      }
+      }
+    }
+
+    /*******************************ECR Login*************************************************/
+    stage('ECR Login') {
+      steps {
+        sh '$(aws ecr get-login --no-include-email)'
+      }
+    }
+
+   /*******************************Build Flask Project*************************************************/
+    stage('Build and push') {
+      steps {
+        sh 'docker build -t $DOCKER_IMAGE .'
+        sh 'docker push $DOCKER_IMAGE'
+      }
+    }
+
+
+    stage('Apply the new configurations') {
+      steps {
+          script {
+                      
+            /****************INSTALLING HELM CHART*********************/                 
+            echo 'Installing helm chart'
+            sh '''
+            helm upgrade flask ${DIR_PROJECT}/helm -i \
+                --set deployment.image.tag=$DOCKER_TAG 
+            '''
+      }
+     }
+    }
+
+  }
+
+
+/*******************************Declare Global variables*************************************************/
+  environment {
+    CONTEXT = 'rewind'
+    DOCKER_REGISTRY = '' // Update ECR repository 
+    DOCKER_REPOSITORY = 'rewind/test-flask'
+    DOCKER_IMAGE = "$DOCKER_REGISTRY/$DOCKER_REPOSITORY:latest"
+    DIR_PROJECT = "$WORKSPACE"
+  }
+
+}

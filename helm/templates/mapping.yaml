@@ -1,0 +1,15 @@
+apiVersion: getambassador.io/v1
+kind: Mapping
+metadata:
+  name: {{ .Release.Name }}
+  {{- include "mychart.labels" . | indent 2 }}
+spec:
+  host: {{ .Release.Name }}.{{ .Values.mapping.hostUrl }}
+  prefix: /
+  service: http://{{ .Release.Name }}.{{ .Release.Namespace }}:{{ .Values.service.port }}
+  timeout_ms: {{ .Values.service.timeout }}
+  resolver: endpoint
+  load_balancer:
+    policy: ring_hash
+    cookie:
+      name: stickyname
